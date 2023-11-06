@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "runner.fullname" . }}
+  labels:
+    {{- include "runner.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "runner.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "runner.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: runner
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ .Values.image.repository | required "image.repository" }}:{{ .Values.image.tag | required "image.tag" }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: GITHUB_URL
+              value: {{ .Values.runner.organizationUrl | required "runner.organizationUrl" }}
+            {{- if .Values.runner.name }}
+            - name: GITHUB_RUNNER_NAME
+              value: {{ .Values.runner.name }}
+            {{- end }}
+            - name: GITHUB_RUNNER_GROUP
+              value: {{ .Values.runner.group | required "runner.group" }}
+            {{- if .Values.runner.labels }}
+            - name: GITHUB_RUNNER_LABELS
+              value: {{ .Values.runner.labels | join "," }}
+            {{- end }}
+            {{- if .Values.runner.tokenSecretName }}
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.runner.tokenSecretName }}
+                  key: {{ .Values.runner.tokenSecretKey | required "runner.tokenSecretKey must be provided" }}
+            {{- else if .Values.runner.token }}
+            - name: GITHUB_TOKEN
+              value: {{ .Values.runner.token }}
+            {{- else }}
+            {{- fail "runner.token or runner.tokenSecretName must be provided" }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

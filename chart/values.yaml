@@ -1,0 +1,59 @@
+runner:
+
+  # e.g.: https://github.com/my-org-name
+  organizationUrl: ""
+
+
+  # Runner name which will be displayed on GitHub, defaults to hostname
+  name: ""
+
+
+  # Runner group name which will be displayed on GitHub, defaults to "Default"
+  group: "Default"
+
+
+  # GitHub runner labels to be used for runner selection in 'runs-on' section of workflow
+  labels: 
+    - "dockerized-runner"
+    - "runner-on-kubernetes"
+    - "hosted-ubuntu-20.04"
+    - "hosted-ubuntu-latest"
+
+
+  # --- AUTH ---
+  # 1st option : GitHub runner token as plain text
+  token: ""
+  # 2nd option : GitHub runner token as Kubernetes secret
+  tokenSecretName: ""
+  tokenSecretKey: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 1
+
+image:
+  repository: btungut/github-runner-on-kubernetes
+  pullPolicy: IfNotPresent
+  tag: 900889d-30-r01 #900889d
+
+imagePullSecrets: []
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10000
+  runAsGroup: 10000
+
+podAnnotations: {}
+securityContext: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

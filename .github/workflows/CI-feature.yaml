@@ -1,0 +1,132 @@
+name: CI Feature Branch
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - feature/*
+    paths:
+      - "src/**"
+      - "Dockerfile"
+
+run-name: ${{ format('{00}-r{01}', github.run_number, github.run_attempt) }}
+
+env:
+  HELM_DIR: "chart"
+  HELM_TEMPLATE_VALUES: "--set runner.organizationUrl=https://github.com/btungut --set runner.name=TestRunnerName --set runner.token=ABC123"
+
+jobs:
+  docker:
+    name: docker build and push
+    uses: btungut/devops/.github/workflows/workflow-docker-build-push.yml@master
+    with:
+      runs-on: ubuntu-latest
+      app-name: github-runner-on-kubernetes
+      build-docker-context-path: src
+      build-docker-file-path: Dockerfile
+      docker-server: ${{ vars.DOCKER_SERVER }}
+      docker-username: ${{ vars.DOCKER_USERNAME }}
+      docker-repository: ${{ vars.DOCKER_REPOSITORY }}
+    secrets:
+      docker-password: ${{ secrets.DOCKER_PASSWORD }}
+
+
+  helm:
+    runs-on: ubuntu-latest
+    needs: docker
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    if: success()
+    env:
+      GIT_COMMIT_ID: ${{ needs.docker.outputs.GIT_COMMIT_ID }}
+      REV_UNIQUE: ${{ needs.docker.outputs.REV_UNIQUE }}
+      GIT_COMMIT_MSG: ${{ needs.docker.outputs.GIT_COMMIT_MSG }}
+      DOCKER_IMAGE: ${{ needs.docker.outputs.DOCKER_IMAGE }}
+      DOCKER_TAG: ${{ needs.docker.outputs.DOCKER_TAG }}
+    steps:
+      - uses: btungut/devops/.github/actions/common@master
+        id: common-vars
+
+      - uses: btungut/devops/.github/actions/git-checkout@master
+        with:
+          gitToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: validate helm chart
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          [[ -d $HELM_DIR ]] || { echo "helm chart directory not found"; exit 1; }
+          cd $HELM_DIR
+          [[ -f Chart.yaml ]] || { echo "Chart.yaml not found"; exit 1; }
+          [[ -f values.yaml ]] || { echo "values.yaml not found"; exit 1; }
+
+          echo "Chart.yaml and values.yaml found"
+          echo "helm dependency update is running..."
+          helm dependency update .
+        working-directory: app
+
+      - name: helm modify
+        id: helm-modify
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd $HELM_DIR
+          tree .
+
+          CHART_VERSION_WITHOUT_BETA=$(yq '.version' Chart.yaml | cut -f1 -d"-")
+          NEW_CHART_VERSION="${CHART_VERSION_WITHOUT_BETA}-${{ env.DOCKER_TAG}}"
+          echo "NEW_CHART_VERSION=$NEW_CHART_VERSION" >> $GITHUB_ENV
+          echo "NEW_CHART_VERSION=$NEW_CHART_VERSION" >> $GITHUB_OUTPUT
+          echo "NEW_CHART_VERSION=$NEW_CHART_VERSION"
+          
+          MODIFY_YAML_SCRIPT="${{ github.workspace }}/devops/scripts/modify-yaml.sh"
+          chmod +x $MODIFY_YAML_SCRIPT
+
+
+          $MODIFY_YAML_SCRIPT "Chart.yaml" ".version" "$NEW_CHART_VERSION"
+          $MODIFY_YAML_SCRIPT "Chart.yaml" ".description" "$GIT_COMMIT_MSG"
+          $MODIFY_YAML_SCRIPT "Chart.yaml" '.annotations["github.com/hash"]' "$GIT_COMMIT_ID"
+          $MODIFY_YAML_SCRIPT "Chart.yaml" '.annotations["github.com/run-url"]' "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo -e "\n\n--- Chart.yaml ---"
+          cat Chart.yaml
+          echo "--- Chart.yaml ---"
+
+
+          $MODIFY_YAML_SCRIPT "values.yaml" ".image.repository" "$DOCKER_IMAGE"
+          $MODIFY_YAML_SCRIPT "values.yaml" ".image.tag" "$DOCKER_TAG" "$GIT_COMMIT_ID"
+          echo -e "\n\n--- values.yaml ---"
+          cat values.yaml
+          echo "--- values.yaml ---"
+        working-directory: app
+
+      - name: helm validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd $HELM_DIR
+          tree .
+
+          echo "helm lint is running..."
+          helm lint .
+          echo "helm lint is completed"
+
+          echo "helm template is running with : $HELM_TEMPLATE_VALUES ..."
+          helm template . $HELM_TEMPLATE_VALUES
+          echo "helm template is completed"
+        working-directory: app
+
+      - name: git push
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd $HELM_DIR
+
+          git fetch origin
+          git pull origin ${{ github.ref }}
+          git add .
+          git commit -m "helm chart is upgraded to $NEW_CHART_VERSION [no ci]"
+          git push origin ${{ github.ref }}
+        working-directory: app

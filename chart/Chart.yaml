@@ -1,0 +1,31 @@
+apiVersion: v2
+name: github-runner-on-kubernetes
+description: init (900889d)
+type: application
+version: 2.311.0-900889d-30-r01
+appVersion: "2.311.0"
+
+keywords:
+  - "github runner"
+  - "kubernetes"
+  - "github runner on kubernetes"
+  - "dockerized github runner"
+
+home: https://github.com/btungut/github-runner-on-kubernetes
+sources:
+  - "https://github.com/btungut/github-runner-on-kubernetes"
+
+maintainers:
+  - name: "Burak Tungut"
+    email: "burak.tungut@microsoft.com"
+
+annotations:
+  github.com/owner: "btungut"
+  github.com/repository: "github-runner-on-kubernetes"
+  github.com/hash: 900889d
+  github.com/run-url: https://github.com/btungut/github-runner-on-kubernetes/actions/runs/6766210395
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: MIT
+  artifacthub.io/links: |
+    - name: GitHub
+      url: https://github.com/btungut/github-runner-on-kubernetes
