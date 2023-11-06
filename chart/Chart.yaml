@@ -1,8 +1,8 @@
 apiVersion: v2
 name: github-runner-on-kubernetes
-description: init (900889d)
+description: Initial commit (fea6bb5)
 type: application
-version: 2.311.0-900889d-30-r01
+version: 2.311.0-fea6bb5-03-r01
 appVersion: "2.311.0"
 
 keywords:
@@ -22,8 +22,8 @@ maintainers:
 annotations:
   github.com/owner: "btungut"
   github.com/repository: "github-runner-on-kubernetes"
-  github.com/hash: 900889d
-  github.com/run-url: https://github.com/btungut/github-runner-on-kubernetes/actions/runs/6766210395
+  github.com/hash: fea6bb5
+  github.com/run-url: https://github.com/btungut/github-runner-on-kubernetes/actions/runs/6766384708
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/license: MIT
   artifacthub.io/links: |

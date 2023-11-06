@@ -35,7 +35,7 @@ replicaCount: 1
 image:
   repository: btungut/github-runner-on-kubernetes
   pullPolicy: IfNotPresent
-  tag: 900889d-30-r01 #900889d
+  tag: fea6bb5-03-r01 #fea6bb5
 
 imagePullSecrets: []
 
