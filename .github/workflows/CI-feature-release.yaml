@@ -1,4 +1,4 @@
-name: CI Feature Branch
+name: CI Feature & Release Branches
 
 on:
   workflow_dispatch: {}
@@ -10,7 +10,7 @@ on:
       - "src/**"
       - "Dockerfile"
 
-run-name: ${{ format('{00}-r{01}', github.run_number, github.run_attempt) }}
+run-name: ${{ format('{0}   {01}-r{02}', github.ref_name, github.run_number, github.run_attempt) }}
 
 env:
   HELM_DIR: "chart"
