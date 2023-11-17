@@ -1,16 +1,15 @@
-name: CI Feature & Release Branches
+name: CI Release Branches
 
 on:
-  workflow_dispatch: {}
-  push:
-    branches:
-      - feature/*
-      - release/*
-    paths:
-      - "src/**"
-      - "Dockerfile"
+  workflow_dispatch:
+    inputs:
+      docker-build-only:
+        description: 'docker build only'
+        required: true
+        default: false
+        type: boolean
 
-run-name: ${{ format('{0}   {01}-r{02}', github.ref_name, github.run_number, github.run_attempt) }}
+run-name: ${{ format('{0}-{01}-r{02}', github.ref_name, github.run_number, github.run_attempt) }}
 
 env:
   HELM_DIR: "chart"
@@ -18,8 +17,9 @@ env:
 
 jobs:
   docker:
-    name: docker build and push
+    name: docker build
     uses: btungut/devops/.github/workflows/workflow-docker-build-push.yml@master
+    
     with:
       runs-on: ubuntu-latest
       app-name: github-runner-on-kubernetes
@@ -28,6 +28,7 @@ jobs:
       docker-server: ${{ vars.DOCKER_SERVER }}
       docker-username: ${{ vars.DOCKER_USERNAME }}
       docker-repository: ${{ vars.DOCKER_REPOSITORY }}
+      docker-build-only: ${{ github.event.inputs.docker-build-only }}
     secrets:
       docker-password: ${{ secrets.DOCKER_PASSWORD }}
 
@@ -53,21 +54,6 @@ jobs:
       - uses: btungut/devops/.github/actions/git-checkout@master
         with:
           gitToken: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: validate helm chart
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          [[ -d $HELM_DIR ]] || { echo "helm chart directory not found"; exit 1; }
-          cd $HELM_DIR
-          [[ -f Chart.yaml ]] || { echo "Chart.yaml not found"; exit 1; }
-          [[ -f values.yaml ]] || { echo "values.yaml not found"; exit 1; }
-
-          echo "Chart.yaml and values.yaml found"
-          echo "helm dependency update is running..."
-          helm dependency update .
-        working-directory: app
 
       - name: helm modify
         id: helm-modify
