@@ -1,4 +1,4 @@
-name: CI Release Branches
+name: CI Branch
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       docker-build-only:
         description: 'docker build only'
         required: true
-        default: false
+        default: true
         type: boolean
 
 run-name: ${{ format('{0}-{01}-r{02}', github.ref_name, github.run_number, github.run_attempt) }}
