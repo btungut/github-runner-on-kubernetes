@@ -17,10 +17,6 @@ runner:
     - "dockerized-ubuntu"
     - "dockerized-ubuntu-20.04"
     - "dockerized-runner"
-    - "runner-on-kubernetes"
-    - "hosted-ubuntu-20.04"
-    - "hosted-ubuntu-latest"
-
 
   # --- AUTH ---
   # 1st option : GitHub runner token as plain text
