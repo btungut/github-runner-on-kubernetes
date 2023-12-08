@@ -28,6 +28,7 @@ runner:
 nameOverride: ""
 fullnameOverride: ""
 
+revisionHistoryLimit: 0
 replicaCount: 1
 
 image:
