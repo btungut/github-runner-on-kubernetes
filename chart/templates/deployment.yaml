@@ -41,7 +41,7 @@ spec:
               value: {{ .Values.runner.group | required "runner.group" }}
             {{- if .Values.runner.labels }}
             - name: GITHUB_RUNNER_LABELS
-              value: {{ .Values.runner.labels | trim | join "," | trim | quote }}
+              value: {{ .Values.runner.labels | join "," | trim | quote }}
             {{- end }}
             {{- if .Values.runner.tokenSecretName }}
             - name: GITHUB_TOKEN
