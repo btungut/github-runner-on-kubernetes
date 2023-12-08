@@ -36,7 +36,6 @@ set -euo pipefail
     --runnergroup "${GITHUB_RUNNER_GROUP}" \
     --name "${GITHUB_RUNNER_NAME}" \
     --labels "${GITHUB_RUNNER_LABELS}" \
-    --ephemeral \
     --unattended \
     --replace
 echo "Configuration completed successfully"

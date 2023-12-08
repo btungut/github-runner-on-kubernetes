@@ -66,7 +66,7 @@ WORKDIR ${CONTAINER_USER_HOME}
 
 ### Install the runner
 RUN wget https://github.com/actions/runner/releases/download/v$RUNNER_VERSION/actions-runner-linux-x64-$RUNNER_VERSION.tar.gz -O ${CONTAINER_USER_HOME}/${TGZ_FILE_NAME}
-WORKDIR ${CONTAINER_USER_HOME}/runner --chown=${CONTAINER_USER}
+WORKDIR ${CONTAINER_USER_HOME}/runner
 RUN tar xzf ${CONTAINER_USER_HOME}/${TGZ_FILE_NAME} -C .
 COPY --chown=${CONTAINER_USER} --chmod=+x entrypoint.sh .
 RUN chmod +x ./entrypoint.sh
