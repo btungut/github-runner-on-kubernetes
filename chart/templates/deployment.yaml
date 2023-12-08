@@ -18,3 +18,4 @@ spec:
       {{- end }}
       labels:
         {{- include "runner.selectorLabels" . | nindent 8 }}
+    spec: {}
