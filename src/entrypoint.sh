@@ -52,4 +52,7 @@ This repository and its contents are published under MIT license and purpose of 
 Please ensure the stability of your environment before using this repository!
 EOF
 
+set +e
 ./run.sh
+
+echo "Runner is stopping..."
