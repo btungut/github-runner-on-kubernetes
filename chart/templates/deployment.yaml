@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "runner.labels" . | nindent 4 }}
 spec:
-  revisionHistoryLimit: {{ .Values.revisionHistoryLimit | default 0 }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit | default 1 }}
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
