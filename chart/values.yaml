@@ -13,7 +13,9 @@ runner:
 
 
   # GitHub runner labels to be used for runner selection in 'runs-on' section of workflow
-  labels: 
+  labels:
+    - "dockerized-ubuntu"
+    - "dockerized-ubuntu-20.04"
     - "dockerized-runner"
     - "runner-on-kubernetes"
     - "hosted-ubuntu-20.04"
@@ -35,7 +37,7 @@ replicaCount: 1
 image:
   repository: btungut/github-runner-on-kubernetes
   pullPolicy: IfNotPresent
-  tag: 2.311.0.1 #fea6bb5
+  tag: 2.311.1 #fea6bb5
 
 imagePullSecrets: []
 
