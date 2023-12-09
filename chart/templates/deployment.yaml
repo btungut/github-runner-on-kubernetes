@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "runner.labels" . | nindent 4 }}
 spec:
-  revisionHistoryLimit: {{ .Values.revisionHistoryLimit | default 1 }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit | default 0 }}
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
@@ -19,6 +19,7 @@ spec:
       labels:
         {{- include "runner.selectorLabels" . | nindent 8 }}
     spec:
+      terminationGracePeriodSeconds: 30
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -33,7 +34,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: GITHUB_URL
-              value: {{ .Values.runner.organizationUrl | required "runner.organizationUrl" }}
+              value: {{ .Values.runner.baseUrl | required "runner.baseUrl" }}/{{ .Values.runner.organizationName | required "runner.organizationName" }}
+            - name: GITHUB_ORG_NAME
+              value: {{ .Values.runner.organizationName | required "runner.organizationName" }}
             {{- if .Values.runner.name }}
             - name: GITHUB_RUNNER_NAME
               value: {{ .Values.runner.name }}
@@ -42,19 +45,18 @@ spec:
               value: {{ .Values.runner.group | required "runner.group" }}
             {{- if .Values.runner.labels }}
             - name: GITHUB_RUNNER_LABELS
-              value: {{ .Values.runner.labels | join "," | trim | quote }}
+              value: {{ tpl (.Values.runner.labels | join "," | trim | quote) . }}
             {{- end }}
-            {{- if .Values.runner.tokenSecretName }}
-            - name: GITHUB_TOKEN
+            - name: GITHUB_PAT
+            {{- if .Values.runner.patSecretName }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.runner.tokenSecretName }}
-                  key: {{ .Values.runner.tokenSecretKey | required "runner.tokenSecretKey must be provided" }}
-            {{- else if .Values.runner.token }}
-            - name: GITHUB_TOKEN
-              value: {{ .Values.runner.token | trim | quote }}
+                  name: {{ .Values.runner.patSecretName }}
+                  key: {{ .Values.runner.patSecretKey | required "runner.patSecretKey must be provided" }}
+            {{- else if .Values.runner.pat }}
+              value: {{ .Values.runner.pat | trim | quote }}
             {{- else }}
-            {{- fail "runner.token or runner.tokenSecretName must be provided" }}
+            {{- fail "runner.pat or runner.patSecretName must be provided" }}
             {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

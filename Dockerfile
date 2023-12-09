@@ -68,7 +68,11 @@ WORKDIR ${CONTAINER_USER_HOME}
 RUN wget https://github.com/actions/runner/releases/download/v$RUNNER_VERSION/actions-runner-linux-x64-$RUNNER_VERSION.tar.gz -O ${CONTAINER_USER_HOME}/${TGZ_FILE_NAME}
 WORKDIR ${CONTAINER_USER_HOME}/runner
 RUN tar xzf ${CONTAINER_USER_HOME}/${TGZ_FILE_NAME} -C .
+
 COPY --chown=${CONTAINER_USER} --chmod=+x entrypoint.sh .
 RUN chmod +x ./entrypoint.sh
+
+COPY --chown=${CONTAINER_USER} --chmod=+x call-api-github.sh .
+RUN chmod +x ./call-api-github.sh
 
 CMD ["./entrypoint.sh"]

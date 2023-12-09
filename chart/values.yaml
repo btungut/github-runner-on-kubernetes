@@ -1,7 +1,10 @@
 runner:
 
-  # e.g.: https://github.com/my-org-name
-  organizationUrl: ""
+  # e.g.: https://github.com
+  baseUrl: ""
+
+  # e.g.: btungut
+  organizationName: ""
 
 
   # Runner name which will be displayed on GitHub, defaults to hostname
@@ -17,18 +20,19 @@ runner:
     - "dockerized-ubuntu"
     - "dockerized-ubuntu-20.04"
     - "dockerized-runner"
+    # - "{{ .Release.Name }}"
 
   # --- AUTH ---
-  # 1st option : GitHub runner token as plain text
-  token: ""
-  # 2nd option : GitHub runner token as Kubernetes secret
-  tokenSecretName: ""
-  tokenSecretKey: ""
+  # 1st option : PAT for generating GitHub runner tokens as plain text
+  pat: ""
+  # 2nd option : PAT for generating GitHub runner tokens as stored in Kubernetes secret
+  patSecretName: ""
+  patSecretKey: ""
 
 nameOverride: ""
 fullnameOverride: ""
 
-revisionHistoryLimit: 1
+revisionHistoryLimit: 0
 replicaCount: 1
 
 image:
