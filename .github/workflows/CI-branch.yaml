@@ -13,7 +13,7 @@ run-name: ${{ format('{0}-{01}-r{02}', github.ref_name, github.run_number, githu
 
 env:
   HELM_DIR: "chart"
-  HELM_TEMPLATE_VALUES: "--set runner.organizationUrl=https://github.com/btungut --set runner.name=TestRunnerName --set runner.token=ABC123"
+  HELM_TEMPLATE_VALUES: "--set runner.organizationName=btungut --set runner.pat=hop --set runner.baseUrl=https://github.com"
 
 jobs:
   docker:
