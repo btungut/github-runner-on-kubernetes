@@ -28,7 +28,6 @@ jobs:
       docker-server: ${{ vars.DOCKER_SERVER }}
       docker-username: ${{ vars.DOCKER_USERNAME }}
       docker-repository: ${{ vars.DOCKER_REPOSITORY }}
-      docker-build-only: ${{ github.event.inputs.docker-build-only }}
     secrets:
       docker-password: ${{ secrets.DOCKER_PASSWORD }}
 

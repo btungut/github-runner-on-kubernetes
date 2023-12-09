@@ -1,8 +1,8 @@
 apiVersion: v2
 name: github-runner-on-kubernetes
-description: Initial commit (fea6bb5)
+description: Squashed commit for 2.311.2 (25514db)
 type: application
-version: 2.311.1
+version: 2.311.2
 appVersion: "2.311.0"
 
 keywords:
@@ -22,8 +22,7 @@ maintainers:
 annotations:
   github.com/owner: "btungut"
   github.com/repository: "github-runner-on-kubernetes"
-  github.com/hash: fea6bb5
-  github.com/run-url: https://github.com/btungut/github-runner-on-kubernetes/actions/runs/6766384708
+  github.com/hash: 25514db
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/license: MIT
   artifacthub.io/links: |
